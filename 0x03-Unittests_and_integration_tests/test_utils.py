@@ -4,7 +4,9 @@
 import unittest
 from typing import Tuple, Dict, Union
 from parameterized import parameterized
+from unittest.mock import patch, Mock
 access_nested_map = __import__("utils").access_nested_map
+get_json = __import__("utils").get_json
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -29,3 +31,20 @@ class TestAccessNestedMap(unittest.TestCase):
         """method tests if the exception is raised"""
         with self.assertRaises(KeyError):
             access_nested_map(nested_map, path)
+
+
+class TestGetJson(unittest.TestCase):
+    """Class Tests get_json method from utils.py"""
+    @parameterized.expand([
+        ("http://example.com", {"payload": True}),
+        ("http://holberton.io", {"payload": False})
+        ])
+    def test_get_json(self, test_url: str, expected: Dict):
+        """Method tests get_json"""
+        mock_get = Mock()
+        mock_get.json.return_value = expected
+
+        with patch("requests.get", return_value=mock_get) as mock_request:
+            result = get_json(test_url)
+            self.assertEqual(result, expected)
+            mock_request.assert_called_once()

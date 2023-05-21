@@ -20,4 +20,4 @@ class TestGithubOrgClient(unittest.TestCase):
         mock_org.return_value = expected
         mock_obj = GithubOrgClient(org)
         self.assertEqual(mock_obj.org, expected)
-        mock_org.assert_called_once_with(f"https://api.github.com/orgs/{org}")
+        mock_org.assert_called_once_with(f"https://api.github.com/orgs/" + org)

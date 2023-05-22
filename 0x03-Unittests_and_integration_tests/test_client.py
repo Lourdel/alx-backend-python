@@ -2,10 +2,11 @@
 """Module defines GithubOrgclient test methods"""
 
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, PropertyMock
 from typing import Dict
 from parameterized import parameterized
 from client import GithubOrgClient
+from fixtures import TEST_PAYLOAD
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -15,9 +16,18 @@ class TestGithubOrgClient(unittest.TestCase):
         ("abc", {"id": 244})
         ])
     @patch("client.get_json")
-    def test_org(self, org: str, expected: Dict, mock_org: Mock):
+    def test_org(self, org: str, expected: Dict, mock_org: Mock) -> None:
         """Method tests org function"""
         mock_org.return_value = expected
         mock_obj = GithubOrgClient(org)
         self.assertEqual(mock_obj.org, expected)
-        mock_org.assert_called_once_with(f"https://api.github.com/orgs/" + org)
+        mock_org.assert_called_once_with("https://api.github.com/orgs/" + org)
+
+    def test_public_repos_url(self):
+        """Method tests _public_repos_url"""
+        expected = "https://api.github.com/orgs/repo"
+        payload = {"repos_url": "https://api.github.com/orgs/repo"}
+        with patch('client.GithubOrgClient.org', PropertyMock(
+                    return_value=payload)):
+            obj = GithubOrgClient("Google")
+            self.assertEqual(obj._public_repos_url, expected)

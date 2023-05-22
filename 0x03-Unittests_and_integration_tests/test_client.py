@@ -31,3 +31,15 @@ class TestGithubOrgClient(unittest.TestCase):
                     return_value=payload)):
             obj = GithubOrgClient("Google")
             self.assertEqual(obj._public_repos_url, expected)
+
+    @patch("client.get_json")
+    def test_public_repos(self, mock_obj: Mock):
+        """Method tests _public_repos property"""
+        expected = {"Command": "git_pull"}
+        mock_obj.return_value = expected
+
+        result = "github.com/google"
+        with patch("client.GithubOrgClient._public_repos_url", PropertyMock(
+                    return_value=result)) as mock_repo:
+            obj = GithubOrgClient("google")
+            self.assertEqual(obj._public_repos_url, result)
